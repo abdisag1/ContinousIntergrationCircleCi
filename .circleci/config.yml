@@ -72,9 +72,9 @@ jobs:
       # Uncomment the line below if you want to fail the current step
       # - run: return 1
       - destroy_environment
-    
+
   # Exercise: Config and Deployment
-  configure_infrastructure: 
+  configure_infrastructure:
     docker:
       - image: python:3.7-alpine3.11
     steps:
@@ -85,11 +85,30 @@ jobs:
           name: Install dependencies
           command: |
             # install the dependencies needed for your playbook
-            apk add --update ansible 
+            apk add --update ansible
       - run:
           name: Configure server
           command: |
             ansible-playbook -i inventory.txt main.yml
+  # Exercise: Smoke Testing
+  smoke_test:
+    docker:
+      - image: alpine:latest
+    steps:
+      - run: apk add --update curl
+      - run:
+          name: smoke test
+          command: |
+            URL="https://blog.udacity.com/"
+            # Test if website exists
+            if curl -s --head ${URL} 
+            then
+              return 0
+            else
+              return 1
+            fi
+      - destroy_environment
+
 # Sequential workflow
 workflows:
   # Name the workflow
